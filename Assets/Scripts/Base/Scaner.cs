@@ -4,18 +4,18 @@ using UnityEngine;
 
 public class Scaner : MonoBehaviour
 {
-    [SerializeField] private float _explosionRadius;
+    [SerializeField] private float _scanRadius;
 
     private void OnValidate()
     {
-        _explosionRadius = Mathf.Abs(_explosionRadius);
+        _scanRadius = Mathf.Abs(_scanRadius);
     }
 
-    private List<Resource> GetResources(Vector3 position, float explosionRadius)
+    public bool  TryGetResources(Vector3 position,  out List<Resource> resources)
     {
-        List<Resource> resources = new List<Resource>();
+        resources = new List<Resource>();
 
-        Collider[] hitColliders = Physics.OverlapSphere(position, explosionRadius);
+        Collider[] hitColliders = Physics.OverlapSphere(position, _scanRadius);
 
         foreach (Collider hitCollider in hitColliders)
         {
@@ -25,6 +25,8 @@ public class Scaner : MonoBehaviour
             }
         }
 
-        return resources;
+        bool isResurcedExist = resources.Count > 0;
+
+        return isResurcedExist;
     }
 }
