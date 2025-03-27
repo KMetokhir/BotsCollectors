@@ -1,18 +1,34 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+
+[RequireComponent (typeof(CapsuleCollider))]
 public class Resource : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    private CapsuleCollider _capsuleCollider;
+    //private bool _isCollected;
+
+    private void Awake()
     {
-        
+        //_isCollected = false;
+        _capsuleCollider = GetComponent<CapsuleCollider> ();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnTriggerEnter(Collider other)
     {
-        
+       /* if (_isCollected)
+        {
+            return;
+        }*/
+
+        if(other.TryGetComponent(out Unit unit))
+        {
+            
+            bool isCollected = unit.TryTakeResource(this);
+
+            if (isCollected)
+            {
+                _capsuleCollider.enabled = false;
+            }
+        }
     }
 }

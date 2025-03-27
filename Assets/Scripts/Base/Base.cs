@@ -30,9 +30,6 @@ public class Base : MonoBehaviour
         }
 
 
-
-
-
         List<Resource> nonAvalibleresources = new List<Resource>();
 
         foreach (Resource resource in _uncollectedResources)
@@ -55,8 +52,18 @@ public class Base : MonoBehaviour
         foreach (Unit unit in _units)
         {
             unit.BecameAvailable += OnUnitBecameAvailable;
+            unit.TookResource += OnEnemyTookResource;
         }
     }
+
+    private void OnDisable()
+    {
+        foreach (Unit unit in _units)
+        {
+            unit.BecameAvailable -= OnUnitBecameAvailable;
+            unit.TookResource -= OnEnemyTookResource;
+        }
+    }  
 
     public void SpawnUnits()
     {
@@ -74,6 +81,11 @@ public class Base : MonoBehaviour
         bool isUnitFound = unit != null;
 
         return isUnitFound;
+    }
+
+    private void OnEnemyTookResource(Resource resource)
+    {
+        throw new NotImplementedException();
     }
 
     private void OnUnitBecameAvailable(Unit unit)
