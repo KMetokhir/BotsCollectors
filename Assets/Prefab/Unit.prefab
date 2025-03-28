@@ -210,6 +210,7 @@ MonoBehaviour:
   _rigidbody: {fileID: 7351551396484762567}
   _speed: 5
   _rotationSpeed: 5
+  _distanceOffset: 0.3
 --- !u!1 &6557316894856909454
 GameObject:
   m_ObjectHideFlags: 0

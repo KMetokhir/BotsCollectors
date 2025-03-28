@@ -1,7 +1,7 @@
 using UnityEngine;
 
 
-[RequireComponent (typeof(CapsuleCollider))]
+[RequireComponent(typeof(CapsuleCollider))]
 public class Resource : MonoBehaviour
 {
     private CapsuleCollider _capsuleCollider;
@@ -10,25 +10,25 @@ public class Resource : MonoBehaviour
     private void Awake()
     {
         //_isCollected = false;
-        _capsuleCollider = GetComponent<CapsuleCollider> ();
+        _capsuleCollider = GetComponent<CapsuleCollider>();
     }
 
     private void OnTriggerEnter(Collider other)
     {
-       /* if (_isCollected)
-        {
-            return;
-        }*/
+        /* if (_isCollected)
+         {
+             return;
+         }*/
 
-        if(other.TryGetComponent(out Unit unit))
+        if (other.TryGetComponent(out IResourceCollector collector))
         {
-            
-            bool isCollected = unit.TryTakeResource(this);
+
+            bool isCollected = collector.TryCollectResource(this);
 
             if (isCollected)
             {
                 _capsuleCollider.enabled = false;
             }
         }
-    }
+    }    
 }

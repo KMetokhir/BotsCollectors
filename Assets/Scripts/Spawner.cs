@@ -7,10 +7,10 @@ public abstract class Spawner<T> : MonoBehaviour
 {
     [SerializeField] private T _prefab;
 
-    public T Spawn(UnitSpawnPoint spawnPoint)
+    public T Spawn(Vector3 spawnPoint)
     {
         T spawnObject = Instantiate(_prefab);
-        spawnObject.transform.position = spawnPoint.position;
+        spawnObject.transform.position = spawnPoint;
 
         return spawnObject;
     }

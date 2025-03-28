@@ -6,18 +6,23 @@ using UnityEngine;
 
 [RequireComponent(typeof(Mover))]
 
-public class Unit : MonoBehaviour
+public class Unit : MonoBehaviour, IResourceCollector, IResourceHandler
 {
     [SerializeField] private Mover _mover;
     [SerializeField] private BagpackPoint _bagPackpoint;
 
     private Resource _targetResource;
+    private bool _isResourceCollected;
 
     public event Action<Unit> BecameAvailable;
-    public event Action<Resource> TookResource;
+    public event Action<Unit> ResourceCollected;
 
     public bool IsAvalible => _targetResource == null;
 
+    private void Awake()
+    {
+        _isResourceCollected = false;
+    }
     private void Start()
     {
         if (_targetResource == null)
@@ -39,30 +44,46 @@ public class Unit : MonoBehaviour
         }
     }
 
-    public bool TryTakeResource(Resource resource)
+    public bool TryCollectResource(Resource resource)
     {
-        bool isResourceRequired = false;
+        _isResourceCollected = false;
 
         if (_targetResource == resource)
         {
-            TookResource?.Invoke(resource);
+            _mover.StopMoving();
+
+            ResourceCollected?.Invoke(this);            
             resource.transform.parent = transform;
             resource.transform.position = _bagPackpoint.transform.position;
-            isResourceRequired = true;
-
-            _mover.StopMoving();
+            _isResourceCollected = true;            
         }
 
-        return isResourceRequired;
-    }
-
-    public bool TryGetResource(out Resource resource)
-    {
-
+        return _isResourceCollected;
     }
 
     public void MoveTo(Vector3 position)
     {
         _mover.StartMoving(position);
     }
+
+    public bool TryGetResource(out Resource resource)
+    {
+        bool isResourceGeted = false;
+
+        if (_isResourceCollected)
+        {
+            resource = _targetResource;
+            isResourceGeted = true;
+            _isResourceCollected = false;
+            _targetResource = null;
+
+            BecameAvailable?.Invoke(this);
+        }
+        else
+        {
+            resource = null;
+        }
+
+        return isResourceGeted;
+    }   
 }

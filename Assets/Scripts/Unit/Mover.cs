@@ -11,6 +11,7 @@ public class Mover : MonoBehaviour
     [SerializeField] private Rigidbody _rigidbody;
     [SerializeField] private float _speed;
     [SerializeField] private float _rotationSpeed;
+    [SerializeField] private float _distanceOffset;
 
     private bool _isMoving = false;
     private Vector3 _target;
@@ -29,6 +30,13 @@ public class Mover : MonoBehaviour
         Vector3 direction = (position - transform.position).normalized;
 
         _rigidbody.velocity = direction * _speed;*/
+    }
+
+    private float GetSqrDistance(Vector3 ownerPosition, Vector3 targetPosition)
+    {
+        targetPosition = new Vector3(targetPosition.x, ownerPosition.y, targetPosition.z);
+
+        return (targetPosition - ownerPosition).sqrMagnitude;
     }
 
     public void StopMoving()
@@ -57,6 +65,15 @@ public class Mover : MonoBehaviour
         {
             Move();
             RotateTo(_target);
+
+            float sqrDistance = GetSqrDistance(transform.position, _target);
+            Debug.Log(sqrDistance);
+
+            if(sqrDistance<= _distanceOffset)
+            {
+                StopMoving();
+                Debug.Log("Sop mov");
+            }
         }
     }
 }
