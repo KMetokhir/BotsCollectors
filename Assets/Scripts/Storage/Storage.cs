@@ -9,6 +9,11 @@ public class Storage : MonoBehaviour
 
     public event Action<int> ValueChanged;
 
+    private void Awake()
+    {
+        ValueChanged?.Invoke((int)value);
+    }
+
     public void AddResource()
     {
         value++;

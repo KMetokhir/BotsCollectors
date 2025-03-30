@@ -1,18 +1,22 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
+
 
 public class StorageView : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] private Storage _storage;
+    [SerializeField] private TMP_Text _textLable;
+
+    private void OnEnable()
     {
-        
+        _storage.ValueChanged += OnValueChanged;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnValueChanged(int value)
     {
-        
+        _textLable.text = value.ToString();
     }
 }
