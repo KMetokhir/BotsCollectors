@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class CameraMover : MonoBehaviour
-{    
+{
     [SerializeField] private float _followSpeed;
 
     [SerializeField] private Transform _folower;

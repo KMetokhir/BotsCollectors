@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,7 +10,7 @@ public class Scaner : MonoBehaviour
         _scanRadius = Mathf.Abs(_scanRadius);
     }
 
-    public bool  TryGetResources(Vector3 position,  out List<Resource> resources)
+    public bool TryGetResources(Vector3 position, out List<Resource> resources)
     {
         resources = new List<Resource>();
 

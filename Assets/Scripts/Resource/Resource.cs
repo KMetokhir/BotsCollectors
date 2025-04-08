@@ -4,24 +4,21 @@ using UnityEngine;
 public class Resource : MonoBehaviour
 {
     private CapsuleCollider _capsuleCollider;
-    //private bool _isCollected;
 
     private void Awake()
     {
-        //_isCollected = false;
         _capsuleCollider = GetComponent<CapsuleCollider>();
+    }
+
+    public void Destroy()
+    {
+        Destroy(gameObject);
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        /* if (_isCollected)
-         {
-             return;
-         }*/
-
         if (other.TryGetComponent(out IResourceCollector collector))
         {
-
             bool isCollected = collector.TryCollectResource(this);
 
             if (isCollected)
@@ -29,5 +26,5 @@ public class Resource : MonoBehaviour
                 _capsuleCollider.enabled = false;
             }
         }
-    }    
+    }
 }

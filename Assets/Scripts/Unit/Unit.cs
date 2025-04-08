@@ -1,11 +1,7 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 [RequireComponent(typeof(Mover))]
-
 public class Unit : MonoBehaviour, IResourceCollector, IResourceHandler
 {
     [SerializeField] private Mover _mover;
@@ -23,6 +19,7 @@ public class Unit : MonoBehaviour, IResourceCollector, IResourceHandler
     {
         _isResourceCollected = false;
     }
+
     private void Start()
     {
         if (_targetResource == null)
@@ -52,10 +49,10 @@ public class Unit : MonoBehaviour, IResourceCollector, IResourceHandler
         {
             _mover.StopMoving();
 
-            ResourceCollected?.Invoke(this);            
+            ResourceCollected?.Invoke(this);
             resource.transform.parent = transform;
             resource.transform.position = _bagPackpoint.transform.position;
-            _isResourceCollected = true;            
+            _isResourceCollected = true;
         }
 
         return _isResourceCollected;
@@ -85,5 +82,5 @@ public class Unit : MonoBehaviour, IResourceCollector, IResourceHandler
         }
 
         return isResourceGeted;
-    }   
+    }
 }

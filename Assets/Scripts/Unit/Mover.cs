@@ -1,9 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static UnityEngine.GraphicsBuffer;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Mover : MonoBehaviour
@@ -25,11 +20,6 @@ public class Mover : MonoBehaviour
     {
         _isMoving = true;
         _target = position;
-
-        /*position = new Vector3(position.x, transform.position.y, position.z);
-        Vector3 direction = (position - transform.position).normalized;
-
-        _rigidbody.velocity = direction * _speed;*/
     }
 
     private float GetSqrDistance(Vector3 ownerPosition, Vector3 targetPosition)
@@ -41,7 +31,7 @@ public class Mover : MonoBehaviour
 
     public void StopMoving()
     {
-        _isMoving = false;        
+        _isMoving = false;
     }
 
     private void RotateTo(Vector3 target)
@@ -67,12 +57,10 @@ public class Mover : MonoBehaviour
             RotateTo(_target);
 
             float sqrDistance = GetSqrDistance(transform.position, _target);
-            Debug.Log(sqrDistance);
 
-            if(sqrDistance<= _distanceOffset)
+            if (sqrDistance <= _distanceOffset)
             {
                 StopMoving();
-                Debug.Log("Sop mov");
             }
         }
     }

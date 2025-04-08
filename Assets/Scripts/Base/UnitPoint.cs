@@ -1,10 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class UnitPoint : MonoBehaviour
 {
-    private Unit _unit;       
+    private Unit _unit;
 
     public void SetUnit(Unit unit)
     {
@@ -33,12 +31,12 @@ public class UnitPoint : MonoBehaviour
         position = Vector3.zero;
 
         if (_unit != null)
-        {           
+        {
             if (_unit == unit)
             {
                 position = transform.position;
-                isBookedByUnit = true;               
-            }         
+                isBookedByUnit = true;
+            }
         }
 
         return isBookedByUnit;

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3285660589250498481}
   - component: {fileID: 736636746819144485}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: BagpackPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -59,7 +59,7 @@ GameObject:
   - component: {fileID: 7351551396484762567}
   - component: {fileID: 7324824528817067721}
   - component: {fileID: 8922053252635308775}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Unit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -223,7 +223,7 @@ GameObject:
   - component: {fileID: 8986445675626635456}
   - component: {fileID: 3737131017902570122}
   - component: {fileID: 2265371643501351055}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}

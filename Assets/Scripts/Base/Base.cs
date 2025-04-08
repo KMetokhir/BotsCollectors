@@ -1,63 +1,36 @@
-using Palmmedia.ReportGenerator.Core.Reporting.Builders;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.UIElements;
 using System.Linq;
 
-[RequireComponent(typeof(Scaner))]
 public class Base : MonoBehaviour
 {
     [SerializeField] private Scaner _scaner;
     [SerializeField] private List<UnitPoint> _unitSpawnPoints;
-    [SerializeField] private UnitSpawner _spawner;    
+    [SerializeField] private UnitSpawner _spawner;
+    [SerializeField] private BaseCollisionHandler _collisionHandler;
+    [SerializeField] private Storage _storage;
 
     private List<Resource> _uncollectedResources;
+    private List<Resource> _resourcesInProcess;
     private List<Unit> _units;
 
     private void Awake()
     {
         _uncollectedResources = new List<Resource>();
+        _resourcesInProcess = new List<Resource>();
         _units = new List<Unit>();
-
-        SpawnUnits();
-
-        if (_scaner.TryGetResources(transform.position, out List<Resource> resources))
-        {
-            _uncollectedResources = resources;
-        }
-
-
-        List<Resource> nonAvalibleresources = new List<Resource>();
-
-        foreach (Resource resource in _uncollectedResources)
-        {
-            if (TryFindFirstAvalibleUnit(out Unit unit))
-            {
-                nonAvalibleresources.Add(resource);
-                unit.SetTargetResource(resource);
-            }
-        }
-
-        foreach (Resource resource in nonAvalibleresources)
-        {
-            _uncollectedResources.Remove(resource);
-        }
     }
 
     private void OnEnable()
     {
-        foreach (Unit unit in _units)
-        {
-            unit.BecameAvailable += OnUnitBecameAvailable;
-            unit.ResourceCollected += OnUnitCollectedResource;
-        }        
-    }   
+        _collisionHandler.ResourceHandlerCollision += ProcessResourceHandlerCollision;
+    }
 
     private void OnDisable()
     {
+        _collisionHandler.ResourceHandlerCollision -= ProcessResourceHandlerCollision;
+
         foreach (Unit unit in _units)
         {
             unit.BecameAvailable -= OnUnitBecameAvailable;
@@ -65,7 +38,7 @@ public class Base : MonoBehaviour
         }
     }
 
-    private void SpawnUnits()
+    public void SpawnUnits()
     {
         foreach (UnitPoint point in _unitSpawnPoints)
         {
@@ -74,7 +47,61 @@ public class Base : MonoBehaviour
                 Unit unit = _spawner.Spawn(position);
                 point.SetUnit(unit);
                 _units.Add(unit);
+
+                unit.BecameAvailable += OnUnitBecameAvailable;
+                unit.ResourceCollected += OnUnitCollectedResource;
             }
+        }
+    }
+
+    public void Scan()
+    {
+        if (_scaner.TryGetResources(transform.position, out List<Resource> resources))
+        {
+            resources = resources.Except(_resourcesInProcess).ToList();
+            _uncollectedResources.AddRange(resources);
+            _uncollectedResources = _uncollectedResources.Distinct().ToList();
+        }
+
+        SetTargetsForUnits();
+    }
+
+    private void ProcessResourceHandlerCollision(IResourceHandler handler)
+    {
+        Unit unit = handler as Unit;
+
+        if (_units.Contains(unit))
+        {
+            if (handler.TryGetResource(out Resource resource))
+            {
+                _storage.AddResource();
+                _resourcesInProcess.Remove(resource);
+                resource.Destroy();
+            }
+        }
+    }
+
+    private void SetTargetsForUnits()
+    {
+        List<Resource> nonAvalibleresources = new List<Resource>();
+
+        foreach (Resource resource in _uncollectedResources)
+        {
+            if (TryFindFirstAvalibleUnit(out Unit unit))
+            {
+                nonAvalibleresources.Add(resource);
+                _resourcesInProcess.Add(resource);
+                unit.SetTargetResource(resource);
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        foreach (Resource resource in nonAvalibleresources)
+        {
+            _uncollectedResources.Remove(resource);
         }
     }
 
@@ -104,11 +131,14 @@ public class Base : MonoBehaviour
 
     private void OnUnitBecameAvailable(Unit unit)
     {
+        if (_uncollectedResources.Count == 0)
+        {
+            Scan();
+        }
+
         if (_uncollectedResources.Count > 0)
         {
-            Resource resource = _uncollectedResources.First();
-            unit.SetTargetResource(resource);
-            _uncollectedResources.Remove(resource); // create method try get avalable resource
+            SetTargetsForUnits();
         }
     }
 }
