@@ -1,9 +1,13 @@
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(CapsuleCollider))]
-public class Resource : MonoBehaviour
+public class Resource : MonoBehaviour, ICollectable
 {
     private CapsuleCollider _capsuleCollider;
+
+    public Vector3 Position => transform.position;
 
     private void Awake()
     {
@@ -15,16 +19,11 @@ public class Resource : MonoBehaviour
         Destroy(gameObject);
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void Collect(Transform ownerTransform, Vector3 newPosition)
     {
-        if (other.TryGetComponent(out IResourceCollector collector))
-        {
-            bool isCollected = collector.TryCollectResource(this);
+        _capsuleCollider.enabled = false;
 
-            if (isCollected)
-            {
-                _capsuleCollider.enabled = false;
-            }
-        }
+        transform.parent = ownerTransform;
+        transform.position = newPosition;
     }
 }

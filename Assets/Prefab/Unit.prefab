@@ -59,6 +59,7 @@ GameObject:
   - component: {fileID: 7351551396484762567}
   - component: {fileID: 7324824528817067721}
   - component: {fileID: 8922053252635308775}
+  - component: {fileID: 8594411797558940941}
   m_Layer: 3
   m_Name: Unit
   m_TagString: Untagged
@@ -194,7 +195,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _mover: {fileID: 8922053252635308775}
-  _bagPackpoint: {fileID: 736636746819144485}
+  _collector: {fileID: 8594411797558940941}
 --- !u!114 &8922053252635308775
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -211,6 +212,19 @@ MonoBehaviour:
   _speed: 5
   _rotationSpeed: 5
   _distanceOffset: 0.3
+--- !u!114 &8594411797558940941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4850937845148346424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9830007dd89f8f4ea4a3df5edf7bb46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _bagPackpoint: {fileID: 736636746819144485}
 --- !u!1 &6557316894856909454
 GameObject:
   m_ObjectHideFlags: 0

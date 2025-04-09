@@ -3,11 +3,11 @@ using UnityEngine;
 
 public class BaseCollisionHandler : MonoBehaviour
 {
-    public Action<IResourceHandler> ResourceHandlerCollision;
+    public Action<ICollectableHandler> ResourceHandlerCollision;
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.TryGetComponent(out IResourceHandler handler))
+        if (other.TryGetComponent(out ICollectableHandler handler))
         {
             ResourceHandlerCollision?.Invoke(handler);
         }

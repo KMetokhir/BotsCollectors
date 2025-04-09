@@ -11,14 +11,10 @@ public class Base : MonoBehaviour
     [SerializeField] private BaseCollisionHandler _collisionHandler;
     [SerializeField] private Storage _storage;
 
-    private List<Resource> _uncollectedResources;
-    private List<Resource> _resourcesInProcess;
     private List<Unit> _units;
 
     private void Awake()
     {
-        _uncollectedResources = new List<Resource>();
-        _resourcesInProcess = new List<Resource>();
         _units = new List<Unit>();
     }
 
@@ -58,60 +54,69 @@ public class Base : MonoBehaviour
     {
         if (_scaner.TryGetResources(transform.position, out List<Resource> resources))
         {
-            resources = resources.Except(_resourcesInProcess).ToList();
-            _uncollectedResources.AddRange(resources);
-            _uncollectedResources = _uncollectedResources.Distinct().ToList();
+            ResourceData.Instance.AddResources(resources);
         }
 
-        SetTargetsForUnits();
+        if (ResourceData.Instance.IsEmpty)
+        {
+            return;
+        }
+
+        if (TryGetAllAvalibleUnits(out IEnumerable<Unit> units))
+        {
+            foreach (Unit unit in units)
+            {
+                if (TrySetTargetForUnit(unit) == false)
+                {
+                    return;
+                }
+            }
+        }
     }
 
-    private void ProcessResourceHandlerCollision(IResourceHandler handler)
+    private void ProcessResourceHandlerCollision(ICollectableHandler handler)
     {
         Unit unit = handler as Unit;
 
         if (_units.Contains(unit))
         {
-            if (handler.TryGetResource(out Resource resource))
+            if (handler.TryGetCollectable(out ICollectable collectable))
             {
-                _storage.AddResource();
-                _resourcesInProcess.Remove(resource);
-                resource.Destroy();
+                Resource resource = collectable as Resource;
+
+                if (resource != null)
+                {
+                    _storage.AddResource();
+                    ResourceData.Instance.Remove(resource);
+                    resource.Destroy();
+                }
             }
         }
     }
 
-    private void SetTargetsForUnits()
+    private bool TrySetTargetForUnit(Unit unit)
     {
-        List<Resource> nonAvalibleresources = new List<Resource>();
+        bool targetSet = false;
 
-        foreach (Resource resource in _uncollectedResources)
+        if (unit.IsAvalible)
         {
-            if (TryFindFirstAvalibleUnit(out Unit unit))
+            if (ResourceData.Instance.TryGetUncollectedResource(out Resource resource))
             {
-                nonAvalibleresources.Add(resource);
-                _resourcesInProcess.Add(resource);
-                unit.SetTargetResource(resource);
-            }
-            else
-            {
-                break;
+                unit.SetTarget(resource);
+                targetSet = true;
             }
         }
 
-        foreach (Resource resource in nonAvalibleresources)
-        {
-            _uncollectedResources.Remove(resource);
-        }
+        return targetSet;
     }
 
-    private bool TryFindFirstAvalibleUnit(out Unit unit)
+    private bool TryGetAllAvalibleUnits(out IEnumerable<Unit> avalibleUnits)
     {
-        unit = _units.FirstOrDefault(n => n.IsAvalible == true);
+        avalibleUnits = _units.Where(unit => unit.IsAvalible == true);
 
-        bool isUnitFound = unit != null;
+        bool unitsFound = avalibleUnits.Count() > 0;
 
-        return isUnitFound;
+        return unitsFound;
     }
 
     private void OnUnitCollectedResource(Unit unit)
@@ -131,14 +136,9 @@ public class Base : MonoBehaviour
 
     private void OnUnitBecameAvailable(Unit unit)
     {
-        if (_uncollectedResources.Count == 0)
+        if (ResourceData.Instance.IsEmpty)
         {
             Scan();
-        }
-
-        if (_uncollectedResources.Count > 0)
-        {
-            SetTargetsForUnits();
         }
     }
 }

@@ -1,61 +1,41 @@
 using System;
 using UnityEngine;
 
-[RequireComponent(typeof(Mover))]
-public class Unit : MonoBehaviour, IResourceCollector, IResourceHandler
+[RequireComponent(typeof(Mover), typeof(Collector))]
+public class Unit : MonoBehaviour, ICollectableHandler
 {
     [SerializeField] private Mover _mover;
-    [SerializeField] private BagpackPoint _bagPackpoint;
 
-    private Resource _targetResource;
-    private bool _isResourceCollected;
+    [SerializeField] private Collector _collector;
 
     public event Action<Unit> BecameAvailable;
     public event Action<Unit> ResourceCollected;
 
-    public bool IsAvalible => _targetResource == null;
+    public bool IsAvalible => _collector.IsAvalible;
 
-    private void Awake()
+    private void OnEnable()
     {
-        _isResourceCollected = false;
+        _collector.BecameAvailable += OnBecameAvalible;
+        _collector.ResourceCollected += OnResourceCollected;
     }
 
-    private void Start()
+    private void OnDisable()
     {
-        if (_targetResource == null)
-        {
-            BecameAvailable?.Invoke(this);
-        }
+        _collector.BecameAvailable -= OnBecameAvalible;
+        _collector.ResourceCollected -= OnResourceCollected;
     }
 
-    public void SetTargetResource(Resource resource)
+    public void SetTarget(ICollectable target)
     {
-        if (IsAvalible == false)
+        if (_collector.IsAvalible == false)
         {
             throw new Exception("Unit " + gameObject.ToString() + " isn't avalible");
         }
         else
         {
-            _targetResource = resource;
-            _mover.StartMoving(_targetResource.transform.position);
+            _collector.SetTarget(target);
+            _mover.StartMoving(target.Position);
         }
-    }
-
-    public bool TryCollectResource(Resource resource)
-    {
-        _isResourceCollected = false;
-
-        if (_targetResource == resource)
-        {
-            _mover.StopMoving();
-
-            ResourceCollected?.Invoke(this);
-            resource.transform.parent = transform;
-            resource.transform.position = _bagPackpoint.transform.position;
-            _isResourceCollected = true;
-        }
-
-        return _isResourceCollected;
     }
 
     public void MoveTo(Vector3 position)
@@ -63,24 +43,19 @@ public class Unit : MonoBehaviour, IResourceCollector, IResourceHandler
         _mover.StartMoving(position);
     }
 
-    public bool TryGetResource(out Resource resource)
+    public bool TryGetCollectable(out ICollectable collectable)
     {
-        bool isResourceGeted = false;
+        return _collector.TryGetCollectable(out collectable);
+    }
 
-        if (_isResourceCollected)
-        {
-            resource = _targetResource;
-            isResourceGeted = true;
-            _isResourceCollected = false;
-            _targetResource = null;
+    private void OnResourceCollected()
+    {
+        _mover.StopMoving();
+        ResourceCollected?.Invoke(this);
+    }
 
-            BecameAvailable?.Invoke(this);
-        }
-        else
-        {
-            resource = null;
-        }
-
-        return isResourceGeted;
+    private void OnBecameAvalible()
+    {
+        BecameAvailable?.Invoke(this);
     }
 }
