@@ -10,17 +10,11 @@ public class Base : MonoBehaviour
     [SerializeField] private UnitSpawner _spawner;
     [SerializeField] private BaseCollisionHandler _collisionHandler;
     [SerializeField] private Storage _storage;
-
-    private List<Unit> _units;
-
-    private void Awake()
-    {
-        _units = new List<Unit>();
-    }
+    [SerializeField] private UnitsData _unitData;
 
     private void OnEnable()
     {
-        _collisionHandler.ResourceHandlerCollision += ProcessResourceHandlerCollision;
+        _collisionHandler.ResourceHandlerCollision += ProcessResourceHandlerCollision;       
     }
 
     private void OnDisable()
@@ -42,7 +36,7 @@ public class Base : MonoBehaviour
             {
                 Unit unit = _spawner.Spawn(position);
                 point.SetUnit(unit);
-                _units.Add(unit);
+                _unitData.Add(unit);
 
                 unit.BecameAvailable += OnUnitBecameAvailable;
                 unit.ResourceCollected += OnUnitCollectedResource;
@@ -62,7 +56,7 @@ public class Base : MonoBehaviour
             return;
         }
 
-        if (TryGetAllAvalibleUnits(out IEnumerable<Unit> units))
+        if (_unitData.TryGetAllAvalibleUnits(out IEnumerable<Unit> units))
         {
             foreach (Unit unit in units)
             {
@@ -78,7 +72,7 @@ public class Base : MonoBehaviour
     {
         Unit unit = handler as Unit;
 
-        if (_units.Contains(unit))
+        if (_unitData.Contains(unit))
         {
             if (handler.TryGetCollectable(out ICollectable collectable))
             {
@@ -108,15 +102,6 @@ public class Base : MonoBehaviour
         }
 
         return targetSet;
-    }
-
-    private bool TryGetAllAvalibleUnits(out IEnumerable<Unit> avalibleUnits)
-    {
-        avalibleUnits = _units.Where(unit => unit.IsAvalible == true);
-
-        bool unitsFound = avalibleUnits.Count() > 0;
-
-        return unitsFound;
     }
 
     private void OnUnitCollectedResource(Unit unit)
