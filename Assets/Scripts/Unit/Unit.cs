@@ -1,39 +1,55 @@
 using System;
 using UnityEngine;
 
-[RequireComponent(typeof(Mover), typeof(Collector))]
-public class Unit : MonoBehaviour, ICollectableHandler
+[RequireComponent(typeof(Mover), typeof(Bag))]
+public class Unit : MonoBehaviour, ICollectableHandler, UnitEvents
 {
     [SerializeField] private Mover _mover;
-
-    [SerializeField] private Collector _collector;
+    [SerializeField] private TargetHandler _targetHandler;
+    [SerializeField] private Bag _bag;
+    [SerializeField] private BaseSpawner _baseSpawner;
 
     public event Action<Unit> BecameAvailable;
     public event Action<Unit> ResourceCollected;
+    public event Action<Unit> NewBaseBuild;
 
-    public bool IsAvalible => _collector.IsAvalible;
+    public bool IsAvalible => _bag.IsEmpty && _targetHandler.IsAvalible;
 
     private void OnEnable()
     {
-        _collector.BecameAvailable += OnBecameAvalible;
-        _collector.ResourceCollected += OnResourceCollected;
+        _targetHandler.FlagFound += OnFlagFound;
+        _targetHandler.CollectableFound += OnCollectableFound;
+    }
+
+    private void Start()
+    {
+        if (IsAvalible)
+        {
+            BecameAvailable?.Invoke(this);
+        }
     }
 
     private void OnDisable()
     {
-        _collector.BecameAvailable -= OnBecameAvalible;
-        _collector.ResourceCollected -= OnResourceCollected;
+        _targetHandler.FlagFound -= OnFlagFound;
+        _targetHandler.CollectableFound -= OnCollectableFound;
     }
 
-    public void SetTarget(ICollectable target)
+    public void ResetTarget()
     {
-        if (_collector.IsAvalible == false)
+        _mover.StopMoving();
+        _targetHandler.ResetTarget();
+    }
+
+    public void SetTarget(IUnitTarget target)
+    {
+        if (_targetHandler.IsAvalible == false)
         {
             throw new Exception("Unit " + gameObject.ToString() + " isn't avalible");
         }
         else
         {
-            _collector.SetTarget(target);
+            _targetHandler.SetTarget(target);
             _mover.StartMoving(target.Position);
         }
     }
@@ -45,17 +61,27 @@ public class Unit : MonoBehaviour, ICollectableHandler
 
     public bool TryGetCollectable(out ICollectable collectable)
     {
-        return _collector.TryGetCollectable(out collectable);
+        if (_bag.TryGetCollectable(out collectable))
+        {
+            BecameAvailable?.Invoke(this);
+        }
+
+        bool isCollectableGotten = collectable != null;
+
+        return isCollectableGotten;
     }
 
-    private void OnResourceCollected()
+    private void OnCollectableFound(ICollectable collectable)
     {
         _mover.StopMoving();
+        _bag.PutCollectable(collectable);
         ResourceCollected?.Invoke(this);
     }
 
-    private void OnBecameAvalible()
+    private void OnFlagFound(Flag flag)
     {
-        BecameAvailable?.Invoke(this);
+        Base newBase = _baseSpawner.Spawn(flag.Position);
+        newBase.AddUnit(this);// ADD SPAWN POINT FOR UNIT IN BASE!!!!
+        NewBaseBuild?.Invoke(this);
     }
 }

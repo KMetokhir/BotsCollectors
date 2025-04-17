@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,7 +6,8 @@ using UnityEngine;
 public abstract class BaseState : MonoBehaviour
 {
     [SerializeField] private BaseState _targetState;
-    [SerializeField] private BaseStateMachine _stateMachine;
+
+    public event Action<BaseState, BaseState> ÑonditionsToChangeState;
 
     private void Awake()
     {
@@ -25,8 +27,8 @@ public abstract class BaseState : MonoBehaviour
         enabled = false;
     }
 
-    protected void TransitToTarGetState()
+    protected void InvokeChangeStateEvent()
     {
-        _stateMachine.Transit(this, _targetState);
+        ÑonditionsToChangeState?.Invoke(this,_targetState);
     }
 }

@@ -4,20 +4,28 @@ public class UnitPoint : MonoBehaviour
 {
     private Unit _unit;
 
+    public bool IsEmpty => _unit == null;
+
     public void SetUnit(Unit unit)
     {
-        if (_unit != null)
+        if (_unit != null || unit == null)
         {
             throw new System.Exception("Unit point is not empty, it is booked by " + _unit.ToString() + " Unit");
         }
 
         _unit = unit;
     }
+
+    public void Clear()
+    {
+        _unit = null;
+    }
+
     public bool TryGetPosition(out Vector3 position)
     {
         position = Vector3.zero;
 
-        if (_unit == null)
+        if (IsEmpty)
         {
             position = transform.position;
         }
@@ -30,7 +38,7 @@ public class UnitPoint : MonoBehaviour
         bool isBookedByUnit = false;
         position = Vector3.zero;
 
-        if (_unit != null)
+        if (IsEmpty == false)
         {
             if (_unit == unit)
             {

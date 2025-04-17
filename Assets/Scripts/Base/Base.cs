@@ -1,36 +1,38 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
 
-public class Base : MonoBehaviour
+public class Base : UnitGenerator, IFlagHolder
 {
     [SerializeField] private Scaner _scaner;
-    [SerializeField] private List<UnitPoint> _unitSpawnPoints;
+    [SerializeField] private SpawnPointsData _spawnPointsData;
     [SerializeField] private UnitSpawner _spawner;
     [SerializeField] private BaseCollisionHandler _collisionHandler;
     [SerializeField] private Storage _storage;
     [SerializeField] private UnitsData _unitData;
+    [SerializeField] private Flag _flag;
 
     private void OnEnable()
     {
-        _collisionHandler.ResourceHandlerCollision += ProcessResourceHandlerCollision;       
+        _collisionHandler.ResourceHandlerCollision += ProcessResourceHandlerCollision;
     }
 
     private void OnDisable()
     {
         _collisionHandler.ResourceHandlerCollision -= ProcessResourceHandlerCollision;
 
-        foreach (Unit unit in _units)
+        foreach (UnitEvents events in _unitData.UnitsEvents)
         {
-            unit.BecameAvailable -= OnUnitBecameAvailable;
-            unit.ResourceCollected -= OnUnitCollectedResource;
+            events.BecameAvailable -= OnUnitBecameAvailable;
+            events.ResourceCollected -= OnUnitCollectedResource;
         }
     }
 
-    public void SpawnUnits()
+    public override bool TryGenerateUnit()
     {
-        foreach (UnitPoint point in _unitSpawnPoints)
+        bool isSpawned = false;
+
+        if (_spawnPointsData.TryGetEmptyPoint(out UnitPoint point))
         {
             if (point.TryGetPosition(out Vector3 position))
             {
@@ -38,10 +40,30 @@ public class Base : MonoBehaviour
                 point.SetUnit(unit);
                 _unitData.Add(unit);
 
+                isSpawned = true;
+
                 unit.BecameAvailable += OnUnitBecameAvailable;
                 unit.ResourceCollected += OnUnitCollectedResource;
+                unit.NewBaseBuild += OnNewBaseBuild;
             }
         }
+
+        return isSpawned;
+    }
+
+    public void AddUnit(Unit unit)
+    {
+        _unitData.Add(unit);
+    }
+
+    public Flag GetFlag()
+    {
+        if (_flag == null)
+        {
+            throw new NullReferenceException(" Flag = null ");
+        }
+
+        return _flag;
     }
 
     public void Scan()
@@ -66,6 +88,16 @@ public class Base : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void OnNewBaseBuild(Unit unit)
+    {
+        _unitData.RemoveUnit(unit);
+        _spawnPointsData.ClearPoint(unit);
+
+        unit.BecameAvailable -= OnUnitBecameAvailable;
+        unit.ResourceCollected -= OnUnitCollectedResource;
+        unit.NewBaseBuild -= OnNewBaseBuild;
     }
 
     private void ProcessResourceHandlerCollision(ICollectableHandler handler)
@@ -106,17 +138,8 @@ public class Base : MonoBehaviour
 
     private void OnUnitCollectedResource(Unit unit)
     {
-        foreach (UnitPoint point in _unitSpawnPoints)
-        {
-            if (point.TryGetPosition(unit, out Vector3 position))
-            {
-                unit.MoveTo(position);
-
-                return;
-            }
-        }
-
-        throw new Exception("Avalable position not found");
+        Vector3 position = _spawnPointsData.GetUnitSpawnPosition(unit);
+        unit.MoveTo(position);
     }
 
     private void OnUnitBecameAvailable(Unit unit)
@@ -125,5 +148,6 @@ public class Base : MonoBehaviour
         {
             Scan();
         }
+        // send to BASE!
     }
 }

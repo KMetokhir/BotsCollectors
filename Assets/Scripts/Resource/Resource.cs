@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.UIElements;
 
 [RequireComponent(typeof(CapsuleCollider))]
-public class Resource : MonoBehaviour, ICollectable
+public class Resource : MonoBehaviour, ICollectable, IUnitTarget
 {
     private CapsuleCollider _capsuleCollider;
 
