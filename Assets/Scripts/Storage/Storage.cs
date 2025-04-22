@@ -23,5 +23,8 @@ public class Storage : MonoBehaviour
         {
             throw new InvalidOperationException($"Storage value {Value} < decrease value {value}");
         }
+
+        Value -= value;
+        ValueChanged?.Invoke((int)Value);
     }
 }

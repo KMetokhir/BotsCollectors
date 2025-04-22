@@ -11,7 +11,7 @@ public class Unit : MonoBehaviour, ICollectableHandler, UnitEvents
 
     public event Action<Unit> BecameAvailable;
     public event Action<Unit> ResourceCollected;
-    public event Action<Unit> NewBaseBuild;
+    public event Action<Unit, Base> NewBaseBuild;
 
     public bool IsAvalible => _bag.IsEmpty && _targetHandler.IsAvalible;
 
@@ -81,7 +81,7 @@ public class Unit : MonoBehaviour, ICollectableHandler, UnitEvents
     private void OnFlagFound(Flag flag)
     {
         Base newBase = _baseSpawner.Spawn(flag.Position);
-        newBase.AddUnit(this);// ADD SPAWN POINT FOR UNIT IN BASE!!!!
-        NewBaseBuild?.Invoke(this);
+        NewBaseBuild?.Invoke(this, newBase);
+        newBase.AddUnit(this);
     }
 }

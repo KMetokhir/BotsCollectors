@@ -4,7 +4,7 @@ using UnityEngine;
 public class Flag : MonoBehaviour, IUnitTarget
 {
     [SerializeField] Transform Transform;
-    
+
     public event Action<Flag> Installed;
     public event Action Uninstalled;
     public Vector3 Position => transform.position;
@@ -26,5 +26,5 @@ public class Flag : MonoBehaviour, IUnitTarget
     {
         Uninstalled?.Invoke();
         gameObject.SetActive(false);
-    }  
+    }
 }

@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Events;
 
 public class UnitsData : MonoBehaviour
 {
     private List<Unit> _units;
 
     public IReadOnlyList<UnitEvents> UnitsEvents { get; private set; }
+    public int Count => _units.Count;
 
     private void Awake()
     {
@@ -28,7 +28,7 @@ public class UnitsData : MonoBehaviour
 
     public void RemoveUnit(Unit unit)
     {
-        if(Contains(unit)== false)
+        if (Contains(unit) == false)
         {
             throw new InvalidOperationException("Doesn't contain unit");
         }

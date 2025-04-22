@@ -377,7 +377,7 @@ MonoBehaviour:
   - {fileID: 1414400435}
   - {fileID: 686857995}
   - {fileID: 1231945874}
-  _spawnDelay: {x: 5, y: 10}
+  _spawnDelay: {x: 3, y: 7}
 --- !u!4 &385560574
 Transform:
   m_ObjectHideFlags: 0
@@ -2285,7 +2285,9 @@ MonoBehaviour:
   _targetState: {fileID: 774175707669609760}
   _storage: {fileID: 6178174574522946473}
   _unitGenerator: {fileID: 2493133898729782752}
-  _unitCost: 5
+  _unitsData: {fileID: 5136018944974794005}
+  _unitCost: 3
+  _unitBuildBaseLimit: 1
   _flag: {fileID: 369888070521325820}
 --- !u!4 &6827931219778296641
 Transform:

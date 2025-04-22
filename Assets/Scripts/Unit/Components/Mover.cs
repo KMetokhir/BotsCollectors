@@ -22,16 +22,16 @@ public class Mover : MonoBehaviour
         _target = position;
     }
 
+    public void StopMoving()
+    {
+        _isMoving = false;
+    }
+
     private float GetSqrDistance(Vector3 ownerPosition, Vector3 targetPosition)
     {
         targetPosition = new Vector3(targetPosition.x, ownerPosition.y, targetPosition.z);
 
         return (targetPosition - ownerPosition).sqrMagnitude;
-    }
-
-    public void StopMoving()
-    {
-        _isMoving = false;
     }
 
     private void RotateTo(Vector3 target)

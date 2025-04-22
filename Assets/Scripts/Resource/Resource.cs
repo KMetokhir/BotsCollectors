@@ -1,6 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.UIElements;
 
 [RequireComponent(typeof(CapsuleCollider))]
 public class Resource : MonoBehaviour, ICollectable, IUnitTarget

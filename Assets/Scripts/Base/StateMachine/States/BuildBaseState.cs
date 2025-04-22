@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BuildBaseState : BaseState
@@ -18,11 +16,20 @@ public class BuildBaseState : BaseState
         _storage.ValueChanged += OnStorageValueChanged;
         _flag.Uninstalled += OnFlagUninstalled;
         _flag.Installed += OnFlagInstalled;
-    }  
+
+        SendUnitToFlag();
+    }
+
+    private void OnDisable()
+    {
+        _storage.ValueChanged -= OnStorageValueChanged;
+        _flag.Uninstalled -= OnFlagUninstalled;
+        _flag.Installed -= OnFlagInstalled;
+    }
 
     private void OnFlagUninstalled()
     {
-        if(_unitBuilder != null)
+        if (_unitBuilder != null)
         {
             Vector3 position = _spawnPointsData.GetUnitSpawnPosition(_unitBuilder);
             _unitBuilder.ResetTarget();
@@ -30,19 +37,20 @@ public class BuildBaseState : BaseState
         }
     }
 
-    private void OnDisable()
-    {
-        _storage.ValueChanged -= OnStorageValueChanged;
-    }
-
     private void OnStorageValueChanged(int value)
     {
-        TrySendUnitToFlag();
+        if (_unitBuilder == null)
+        {
+            SendUnitToFlag();
+        }
     }
 
-    private bool TrySendUnitToFlag()
+    private void SendUnitToFlag()
     {
-        bool isSuccess = false;
+        if (_unitBuilder != null)
+        {
+            throw new Exception("unitBuilder allready send");
+        }
 
         if (_storage.Value >= _newBaseCost)
         {
@@ -50,11 +58,28 @@ public class BuildBaseState : BaseState
             {
                 _unitBuilder = unit;
                 unit.SetTarget(_flag);
-                isSuccess = true;
+                unit.NewBaseBuild += OnNewBaseBuild;
+
             }
         }
+    }
 
-        return isSuccess;
+    private void OnNewBaseBuild(Unit unit, Base newBase)
+    {
+        if (_unitBuilder != unit)
+        {
+            throw new Exception("unitBuilder subscribe error");
+        }
+
+        _storage.Reduce(_newBaseCost);
+
+        unit.NewBaseBuild -= OnNewBaseBuild;
+        _unitBuilder = null;
+
+        _flag.Uninstalled -= OnFlagUninstalled;
+        _flag.Uninstall();
+
+        InvokeChangeStateEvent();
     }
 
     private void OnFlagInstalled(Flag flag)
@@ -63,6 +88,10 @@ public class BuildBaseState : BaseState
         {
             _unitBuilder.ResetTarget();
             _unitBuilder.SetTarget(flag);
+        }
+        else
+        {
+            SendUnitToFlag();
         }
     }
 }

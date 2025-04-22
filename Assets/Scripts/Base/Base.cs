@@ -12,6 +12,8 @@ public class Base : UnitGenerator, IFlagHolder
     [SerializeField] private UnitsData _unitData;
     [SerializeField] private Flag _flag;
 
+    public event Action<Base> NewBaseBuild;
+
     private void OnEnable()
     {
         _collisionHandler.ResourceHandlerCollision += ProcessResourceHandlerCollision;
@@ -25,6 +27,7 @@ public class Base : UnitGenerator, IFlagHolder
         {
             events.BecameAvailable -= OnUnitBecameAvailable;
             events.ResourceCollected -= OnUnitCollectedResource;
+            events.NewBaseBuild -= OnNewBaseBuild;
         }
     }
 
@@ -53,7 +56,23 @@ public class Base : UnitGenerator, IFlagHolder
 
     public void AddUnit(Unit unit)
     {
-        _unitData.Add(unit);
+        if (_spawnPointsData.TryGetEmptyPoint(out UnitPoint point))
+        {
+            _unitData.Add(unit);
+
+            unit.BecameAvailable += OnUnitBecameAvailable;
+            unit.ResourceCollected += OnUnitCollectedResource;
+            unit.NewBaseBuild += OnNewBaseBuild;
+
+            point.SetUnit(unit);
+            unit.ResetTarget();
+            point.TryGetPosition(unit, out Vector3 position);
+            unit.MoveTo(position);
+        }
+        else
+        {
+            throw new Exception("Can't add unit, empty spawn point does not excist");
+        }
     }
 
     public Flag GetFlag()
@@ -90,7 +109,14 @@ public class Base : UnitGenerator, IFlagHolder
         }
     }
 
-    private void OnNewBaseBuild(Unit unit)
+    private void OnNewBaseBuild(Unit unit, Base newBase)
+    {
+        RemoveUnit(unit);
+
+        NewBaseBuild?.Invoke(newBase);
+    }
+
+    private void RemoveUnit(Unit unit)
     {
         _unitData.RemoveUnit(unit);
         _spawnPointsData.ClearPoint(unit);
@@ -144,10 +170,7 @@ public class Base : UnitGenerator, IFlagHolder
 
     private void OnUnitBecameAvailable(Unit unit)
     {
-        if (ResourceData.Instance.IsEmpty)
-        {
-            Scan();
-        }
-        // send to BASE!
+        Vector3 position = _spawnPointsData.GetUnitSpawnPosition(unit);
+        unit.MoveTo(position);
     }
 }

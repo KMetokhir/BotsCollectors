@@ -1,11 +1,12 @@
-using System;
 using UnityEngine;
 
 public class CreateNewUnitState : BaseState
 {
     [SerializeField] private Storage _storage;
     [SerializeField] private UnitGenerator _unitGenerator;
+    [SerializeField] private UnitsData _unitsData;
     [SerializeField] private uint _unitCost;
+    [SerializeField] private uint _unitBuildBaseLimit;
 
     [SerializeField] private Flag _flag;
 
@@ -23,7 +24,10 @@ public class CreateNewUnitState : BaseState
 
     private void OnFlagInstalledEvent(Flag flag)
     {
-        InvokeChangeStateEvent();
+        if (_unitsData.Count >= _unitBuildBaseLimit)
+        {
+            InvokeChangeStateEvent();
+        }
     }
 
     private void OnStorageValueChanged(int storageValue)

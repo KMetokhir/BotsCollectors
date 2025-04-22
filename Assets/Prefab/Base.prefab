@@ -702,7 +702,7 @@ MonoBehaviour:
   _targetState: {fileID: 8523969670364122203}
   _flag: {fileID: 3265720344349102466}
   _storage: {fileID: 9065035140541942487}
-  _newBaseCost: 3
+  _newBaseCost: 4
   _unitData: {fileID: 8013872277508846699}
   _spawnPointsData: {fileID: 920524168122661449}
 --- !u!114 &8523969670364122203
@@ -720,7 +720,9 @@ MonoBehaviour:
   _targetState: {fileID: 2508044091448091742}
   _storage: {fileID: 9065035140541942487}
   _unitGenerator: {fileID: 786252476102747294}
-  _unitCost: 1
+  _unitsData: {fileID: 8013872277508846699}
+  _unitCost: 3
+  _unitBuildBaseLimit: 1
   _flag: {fileID: 3265720344349102466}
 --- !u!1 &4553331321057699677
 GameObject:
