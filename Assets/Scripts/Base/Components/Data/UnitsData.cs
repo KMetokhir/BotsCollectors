@@ -7,13 +7,14 @@ public class UnitsData : MonoBehaviour
 {
     private List<Unit> _units;
 
-    public IReadOnlyList<UnitEvents> UnitsEvents { get; private set; }
+    public IReadOnlyList<Unit> Units { get; private set; }
     public int Count => _units.Count;
+    public int AvalibleUnitsCount => _units.Where(unit => unit.IsAvalible == true).Count();
 
     private void Awake()
     {
         _units = new List<Unit>();
-        UnitsEvents = new List<Unit>(_units);
+        Units = new List<Unit>(_units);
     }
 
     public void Add(Unit unit)
@@ -45,17 +46,13 @@ public class UnitsData : MonoBehaviour
     {
         unit = _units.FirstOrDefault(unit => unit.IsAvalible == true);
 
-        bool unitFound = unit != null;
-
-        return unitFound;
+        return unit != null;
     }
 
     public bool TryGetAllAvalibleUnits(out IEnumerable<Unit> avalibleUnits)
     {
         avalibleUnits = _units.Where(unit => unit.IsAvalible == true);
 
-        bool unitsFound = avalibleUnits.Count() > 0;
-
-        return unitsFound;
+        return avalibleUnits.Count() > 0;
     }
 }

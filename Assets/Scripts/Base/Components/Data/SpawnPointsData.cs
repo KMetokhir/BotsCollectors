@@ -10,9 +10,8 @@ public class SpawnPointsData : MonoBehaviour
     public bool TryGetEmptyPoint(out UnitPoint point)
     {
         point = _unitSpawnPoints.FirstOrDefault(point => point.IsEmpty);
-        bool pointFound = point != null;
 
-        return pointFound;
+        return point != null;
     }
 
     public void ClearPoint(Unit unit)

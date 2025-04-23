@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class BuildBaseState : BaseState
 {
-    [SerializeField] Flag _flag;
+    [SerializeField] private Flag _flag;
     [SerializeField] private Storage _storage;
     [SerializeField] private uint _newBaseCost;
     [SerializeField] private UnitsData _unitData;
@@ -59,7 +59,6 @@ public class BuildBaseState : BaseState
                 _unitBuilder = unit;
                 unit.SetTarget(_flag);
                 unit.NewBaseBuild += OnNewBaseBuild;
-
             }
         }
     }

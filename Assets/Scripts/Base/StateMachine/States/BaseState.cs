@@ -5,7 +5,7 @@ public abstract class BaseState : MonoBehaviour
 {
     [SerializeField] private BaseState _targetState;
 
-    public event Action<BaseState, BaseState> ÑonditionsToChangeState;
+    public event Action<BaseState> ÑonditionsToChangeState;
 
     private void Awake()
     {
@@ -27,6 +27,6 @@ public abstract class BaseState : MonoBehaviour
 
     protected void InvokeChangeStateEvent()
     {
-        ÑonditionsToChangeState?.Invoke(this, _targetState);
+        ÑonditionsToChangeState?.Invoke(_targetState);
     }
 }

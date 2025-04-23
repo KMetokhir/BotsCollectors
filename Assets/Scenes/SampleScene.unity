@@ -1459,7 +1459,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a68ec0785e76e484db6f1d60dca086ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Transform: {fileID: 0}
 --- !u!1 &410692783309654224
 GameObject:
   m_ObjectHideFlags: 0
@@ -1509,7 +1508,7 @@ MonoBehaviour:
   _targetState: {fileID: 6790030915979711781}
   _flag: {fileID: 369888070521325820}
   _storage: {fileID: 6178174574522946473}
-  _newBaseCost: 1
+  _newBaseCost: 5
   _unitData: {fileID: 5136018944974794005}
   _spawnPointsData: {fileID: 2645420298651378487}
 --- !u!1 &792745359772506003
@@ -2414,6 +2413,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _scanRadius: 100
+  _maxCollidersPerScan: 50
 --- !u!114 &8065035805860409764
 MonoBehaviour:
   m_ObjectHideFlags: 0

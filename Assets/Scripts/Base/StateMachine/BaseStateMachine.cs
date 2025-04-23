@@ -14,24 +14,19 @@ public class BaseStateMachine : MonoBehaviour
         _currentState.Enter();
     }
 
-    private void OnConditionChangedState(BaseState stateInvoker, BaseState nextState)
+    private void OnConditionChangedState(BaseState nextState)
     {
-        Transit(stateInvoker, nextState);
+        Transit(nextState);
     }
 
-    private void Transit(BaseState stateInvoker, BaseState nextState)
+    private void Transit(BaseState nextState)
     {
-        if (_currentState != stateInvoker && _currentState != null)
-        {
-            throw new Exception($"State Invoker {stateInvoker.name} is not current active state  {_currentState.name}");
-        }
-
         if (_currentState)
             _currentState.Exit();
 
         _currentState.ÑonditionsToChangeState -= OnConditionChangedState;
         _currentState = nextState;
-        _currentState.ÑonditionsToChangeState += OnConditionChangedState;// if needed??
+        _currentState.ÑonditionsToChangeState += OnConditionChangedState;
 
         if (_currentState)
         {

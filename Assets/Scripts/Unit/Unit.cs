@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Mover), typeof(Bag))]
-public class Unit : MonoBehaviour, ICollectableHandler, UnitEvents
+public class Unit : MonoBehaviour, ICollectableHandler
 {
     [SerializeField] private Mover _mover;
     [SerializeField] private TargetHandler _targetHandler;

@@ -23,11 +23,11 @@ public class Base : UnitGenerator, IFlagHolder
     {
         _collisionHandler.ResourceHandlerCollision -= ProcessResourceHandlerCollision;
 
-        foreach (UnitEvents events in _unitData.UnitsEvents)
+        foreach (Unit unit in _unitData.Units)
         {
-            events.BecameAvailable -= OnUnitBecameAvailable;
-            events.ResourceCollected -= OnUnitCollectedResource;
-            events.NewBaseBuild -= OnNewBaseBuild;
+            unit.BecameAvailable -= SendUnitToBase;
+            unit.ResourceCollected -= SendUnitToBase;
+            unit.NewBaseBuild -= OnNewBaseBuild;
         }
     }
 
@@ -45,8 +45,8 @@ public class Base : UnitGenerator, IFlagHolder
 
                 isSpawned = true;
 
-                unit.BecameAvailable += OnUnitBecameAvailable;
-                unit.ResourceCollected += OnUnitCollectedResource;
+                unit.BecameAvailable += SendUnitToBase;
+                unit.ResourceCollected += SendUnitToBase;
                 unit.NewBaseBuild += OnNewBaseBuild;
             }
         }
@@ -60,8 +60,8 @@ public class Base : UnitGenerator, IFlagHolder
         {
             _unitData.Add(unit);
 
-            unit.BecameAvailable += OnUnitBecameAvailable;
-            unit.ResourceCollected += OnUnitCollectedResource;
+            unit.BecameAvailable += SendUnitToBase;
+            unit.ResourceCollected += SendUnitToBase;
             unit.NewBaseBuild += OnNewBaseBuild;
 
             point.SetUnit(unit);
@@ -121,8 +121,8 @@ public class Base : UnitGenerator, IFlagHolder
         _unitData.RemoveUnit(unit);
         _spawnPointsData.ClearPoint(unit);
 
-        unit.BecameAvailable -= OnUnitBecameAvailable;
-        unit.ResourceCollected -= OnUnitCollectedResource;
+        unit.BecameAvailable -= SendUnitToBase;
+        unit.ResourceCollected -= SendUnitToBase;
         unit.NewBaseBuild -= OnNewBaseBuild;
     }
 
@@ -134,9 +134,7 @@ public class Base : UnitGenerator, IFlagHolder
         {
             if (handler.TryGetCollectable(out ICollectable collectable))
             {
-                Resource resource = collectable as Resource;
-
-                if (resource != null)
+                if (collectable is Resource resource && resource != null)
                 {
                     _storage.AddResource();
                     ResourceData.Instance.Remove(resource);
@@ -162,13 +160,7 @@ public class Base : UnitGenerator, IFlagHolder
         return targetSet;
     }
 
-    private void OnUnitCollectedResource(Unit unit)
-    {
-        Vector3 position = _spawnPointsData.GetUnitSpawnPosition(unit);
-        unit.MoveTo(position);
-    }
-
-    private void OnUnitBecameAvailable(Unit unit)
+    private void SendUnitToBase(Unit unit)
     {
         Vector3 position = _spawnPointsData.GetUnitSpawnPosition(unit);
         unit.MoveTo(position);

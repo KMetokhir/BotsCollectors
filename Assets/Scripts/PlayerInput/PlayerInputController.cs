@@ -22,7 +22,7 @@ public class PlayerInputController : MonoBehaviour
     private void OnEnable()
     {
         _playerInput.Player.Scan.performed += OnScan;
-        _playerInput.Player.LeftMouseButtonClick.performed += OnLeftButtonMouseClicked;
+        _playerInput.Player.LeftMouseButtonClick.started += OnLeftButtonMouseClicked;
         _playerInput.Enable();
 
         _base.NewBaseBuild += OnNewBaseBuild;
@@ -36,6 +36,7 @@ public class PlayerInputController : MonoBehaviour
         }
 
         _playerInput.Player.Scan.performed -= OnScan;
+        _playerInput.Player.LeftMouseButtonClick.started -= OnLeftButtonMouseClicked;
         _playerInput.Disable();
     }
 
